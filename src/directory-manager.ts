@@ -11,7 +11,7 @@ export class DirectoryManager {
     }
   }
 
-  static async moveFileorDirectory(filePath: string, targetPath: string) {
+  static async moveFileOrDirectory(filePath: string, targetPath: string) {
     try {
       await fse.move(filePath, `${targetPath}/${path.basename(filePath)}`);
       console.log(`Moved ${path.basename(filePath)} to ${targetPath}`);
@@ -26,9 +26,8 @@ export class DirectoryManager {
       const detailedFilesPromises = files.map(async (file: string) => {
         const fileDetails = await fse.lstat(path.resolve(filePath, file));
         const { size, birthtime } = fileDetails;
-        // Convert bytes to megabytes
-        const sizeInMB = (size / (1024 * 1024)).toFixed(2); // Limit to 2 decimal places
-        return { filename: file, "size (mb)": sizeInMB, created_at: birthtime };
+
+        return { filename: file, "size (kb)": (size / 1024).toFixed(3), created_at: birthtime };
       });
       const detailedFiles = await Promise.all(detailedFilesPromises);
       console.table(detailedFiles);
@@ -46,10 +45,7 @@ export class DirectoryManager {
       if (!recursive) {
         const stats = await fse.lstat(filePath);
         if (stats.isDirectory()) {
-          console.error(
-            `Cannot delete '${path.basename(filePath)}': It's a directory.`
-          );
-          return;
+          throw new Error(`Cannot delete '${path.basename(filePath)}': It's a directory.`);
         }
       }
 

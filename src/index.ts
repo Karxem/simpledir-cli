@@ -64,10 +64,8 @@ program.command('mk')
     .argument('<name>', 'file or directory name')
     .argument('<target>', 'target relative path')
     .action(async (name: string, target: string) => {
-      await DirectoryManager.moveFileorDirectory(name, target);
+      await DirectoryManager.moveFileOrDirectory(name, target);
     });
 
 program.addHelpText('before', `${figlet.textSync('simpleDir')}`);
-
-if (process.argv.length <= 2) program.outputHelp();
 program.parse(process.argv);
